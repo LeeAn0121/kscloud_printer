@@ -1,0 +1,103 @@
+{
+  "paperWidth": 384,
+  "height": 680,
+  "offsetX": 0,
+  "offsetY": 0,
+  "items": [
+    {
+      "type": "text",
+      "text": "${title}",
+      "x": 192,
+      "y": 28,
+      "align": "center",
+      "fontSize": 40,
+      "bold": true
+    },
+
+    {
+      "type": "text",
+      "text": "${number}",
+      "x": 192,
+      "y": 142,
+      "align": "center",
+      "fontSize": 132,
+      "bold": true,
+      "maxWidth": 300,
+      "minFontSize": 88
+    },
+
+    {
+      "type": "text",
+      "text": "대기인수 : ${waiting_count}명",
+      "x": 192,
+      "y": 278,
+      "align": "center",
+      "fontSize": 36,
+      "bold": false
+    },
+    {
+      "type": "text",
+      "text": "${date_text}",
+      "x": 192,
+      "y": 316,
+      "align": "center",
+      "fontSize": 36,
+      "bold": false
+    },
+    {
+      "type": "text",
+      "text": "${time_text}",
+      "x": 192,
+      "y": 354,
+      "align": "center",
+      "fontSize": 36,
+      "bold": false
+    },
+
+    {
+      "type": "text",
+      "text": "안녕하세요.",
+      "x": 192,
+      "y": 430,
+      "align": "center",
+      "fontSize": 28,
+      "bold": true
+    },
+    {
+      "type": "text",
+      "text": "접수 번호순으로 처리하오니",
+      "x": 192,
+      "y": 462,
+      "align": "center",
+      "fontSize": 25,
+      "bold": false
+    },
+    {
+      "type": "text",
+      "text": "잠시만 기다려 주십시오.",
+      "x": 192,
+      "y": 492,
+      "align": "center",
+      "fontSize": 25,
+      "bold": false
+    },
+    {
+      "type": "text",
+      "text": "대단히 고맙습니다.",
+      "x": 192,
+      "y": 522,
+      "align": "center",
+      "fontSize": 25,
+      "bold": false
+    },
+
+    {
+      "type": "image",
+      "source": "logo",
+      "x": 192,
+      "y": 594,
+      "align": "center",
+      "maxWidth": 240
+    }
+  ]
+}

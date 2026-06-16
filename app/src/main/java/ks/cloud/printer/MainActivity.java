@@ -15,9 +15,6 @@ import android.hardware.usb.UsbManager;
 import android.hardware.usb.UsbConfiguration;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.nio.charset.Charset;
@@ -35,6 +32,7 @@ public class MainActivity extends Activity {
     private UsbManager usbManager;
     private UsbDevice printerDevice;
     private TextView logView;
+    private boolean receiverRegistered;
 
     private final BroadcastReceiver usbReceiver = new BroadcastReceiver() {
         @Override
@@ -47,10 +45,11 @@ public class MainActivity extends Activity {
                 if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
                     log("USB permission granted");
                     printerDevice = device;
-                    printTest(device);
                 } else {
                     log("USB permission denied");
                 }
+
+                finish();
             } else if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
                 log("USB attached");
                 findPrinter();
@@ -67,55 +66,12 @@ public class MainActivity extends Activity {
 
         usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
 
-        LinearLayout layout = new LinearLayout(this);
-        layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setPadding(24, 24, 24, 24);
-
-        Button findButton = new Button(this);
-        findButton.setText("Find Printer");
-
-        Button printButton = new Button(this);
-        printButton.setText("Print Test");
-
-        logView = new TextView(this);
-        logView.setTextSize(14);
-
-        layout.addView(findButton);
-        layout.addView(printButton);
-        layout.addView(logView);
-
-        setContentView(layout);
-
         IntentFilter filter = new IntentFilter();
         filter.addAction(ACTION_USB_PERMISSION);
         filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
         filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
         registerReceiver(usbReceiver, filter);
-
-        findButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                findPrinter();
-            }
-        });
-
-        printButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                log("Print button clicked");
-
-                if (printerDevice == null) {
-                    findPrinter();
-                    return;
-                }
-
-                if (!usbManager.hasPermission(printerDevice)) {
-                    requestPermission(printerDevice);
-                } else {
-                    printTest(printerDevice);
-                }
-            }
-        });
+        receiverRegistered = true;
 
         findPrinter();
     }
@@ -141,7 +97,7 @@ public class MainActivity extends Activity {
                     requestPermission(device);
                 } else {
                     log("Already has USB permission");
-//                    printTest(device);
+                    finish();
                 }
 
                 return;
@@ -149,6 +105,7 @@ public class MainActivity extends Activity {
         }
 
         log("BIXOLON printer not found");
+        finish();
     }
 
     private void requestPermission(UsbDevice device) {
@@ -383,7 +340,11 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
-        unregisterReceiver(usbReceiver);
+        if (receiverRegistered) {
+            unregisterReceiver(usbReceiver);
+            receiverRegistered = false;
+        }
+
         super.onDestroy();
     }
 }

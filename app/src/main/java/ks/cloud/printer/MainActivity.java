@@ -25,6 +25,7 @@ public class MainActivity extends Activity {
 
     private static final String TAG = "KS_PRINTER";
     private static final String ACTION_USB_PERMISSION = "ks.cloud.printer.USB_PERMISSION";
+    private static final String EXTRA_RUN_TEST_PRINT = "run_test_print";
 
     private static final int BIXOLON_VENDOR_ID = 5380;
     private static final int BIXOLON_PRODUCT_ID = 276;
@@ -45,6 +46,7 @@ public class MainActivity extends Activity {
                 if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
                     log("USB permission granted");
                     printerDevice = device;
+                    startTestPrintIfRequested();
                 } else {
                     log("USB permission denied");
                 }
@@ -97,6 +99,7 @@ public class MainActivity extends Activity {
                     requestPermission(device);
                 } else {
                     log("Already has USB permission");
+                    startTestPrintIfRequested();
                     finish();
                 }
 
@@ -119,6 +122,25 @@ public class MainActivity extends Activity {
         );
 
         usbManager.requestPermission(device, permissionIntent);
+    }
+
+    private void startTestPrintIfRequested() {
+        Intent request = getIntent();
+
+        if (request == null || !request.getBooleanExtra(EXTRA_RUN_TEST_PRINT, false)) {
+            return;
+        }
+
+        Intent printIntent = new Intent(this, PrinterService.class);
+        printIntent.setAction(PrinterService.ACTION_PRINT_TICKET);
+        printIntent.putExtra(PrinterService.EXTRA_TITLE, request.getStringExtra(PrinterService.EXTRA_TITLE));
+        printIntent.putExtra(PrinterService.EXTRA_NUMBER, request.getStringExtra(PrinterService.EXTRA_NUMBER));
+        printIntent.putExtra(PrinterService.EXTRA_WAITING_COUNT, request.getStringExtra(PrinterService.EXTRA_WAITING_COUNT));
+        printIntent.putExtra("use_test_logo", true);
+        printIntent.putExtra("use_test_layout", true);
+
+        startService(printIntent);
+        log("test print service started");
     }
 
     private void printTest(UsbDevice device) {

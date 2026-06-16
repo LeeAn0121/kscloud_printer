@@ -1,14 +1,5 @@
-$device = "ZR7MTSCX8M"
+ï»¿$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$uiScript = Join-Path $scriptDir "tools\printer-test-ui.ps1"
 
-Set-Location "E:\kscloudprinter"
+powershell.exe -ExecutionPolicy Bypass -File $uiScript
 
-.\gradlew clean
-if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-
-.\gradlew :app:assembleDebug
-if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-
-adb -s $device install -r .\app\build\outputs\apk\debug\app-debug.apk
-if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-
-adb -s $device shell am startservice -n ks.cloud.printer/.PrinterService -a ks.cloud.printer.action.PRINT_TICKET --es title ´ë±â¹øÈ£ --es number 1014 --es waiting_count 1 --ez use_test_logo true --ez use_test_layout true

@@ -34,7 +34,7 @@ BIXOLON USB 프린터
 - `TicketLayoutRenderer.java`: JSON 레이아웃 렌더링
 - `BixolonUsbPrinter.java`: USB 탐색, Raster 변환 및 출력
 - `ticket_layout.json`: 대기표 디자인
-- `logo.bmp`: 테스트용 기본 로고
+- `logo.bmp`: 앱에 포함된 기본 로고
 
 ## KS Client 연동
 
@@ -167,10 +167,6 @@ layout_json 없음  -> 기존 레거시 대기표
 
 현재 디자인을 사용하려면 KS Client에서 반드시 `layout_json`을 전달해야 합니다.
 
-테스트용으로 `use_test_layout=true`를 보내면 앱에 포함된
-`assets/ticket_layout.json`을 사용합니다. `use_test_logo=true`를 보내면
-`assets/logo.bmp`를 사용합니다.
-
 ## 레이아웃 JSON
 
 기본 용지 폭은 384px이며, 각 항목의 좌표와 글꼴 크기를 JSON으로 관리합니다.
@@ -194,6 +190,15 @@ layout_json 없음  -> 기존 레거시 대기표
 
 현재 로고는 가운데 정렬되고 최대 폭 240px로 비율을 유지하여 렌더링됩니다.
 렌더링 후 마지막 콘텐츠 아래의 흰 공간은 제거됩니다.
+
+현재 기본 레이아웃의 주요 값:
+
+```text
+paperWidth: 384
+height:     680
+logo y:     594
+logo width: 240
+```
 
 ## USB 출력
 
@@ -249,25 +254,22 @@ Debug APK 빌드:
 app/build/outputs/apk/debug/app-debug.apk
 ```
 
-## ADB 테스트
+## 실행 및 권한 확인
+
+Android Studio에서 `Run main`으로 실행하면 별도 테스트 화면을 표시하지 않습니다.
+런처 Activity는 투명 화면으로 실행되어 USB 프린터 권한만 확인하고 바로 종료됩니다.
+
+권한이 없는 경우 Android 시스템 USB 권한 팝업만 표시됩니다. 권한이 이미 있거나
+프린터가 연결되어 있지 않으면 화면 없이 종료됩니다.
+
+기존 테스트 버튼 화면과 자동 테스트 출력은 사용하지 않습니다.
+
+## 설치 및 로그 확인
 
 앱 설치:
 
 ```powershell
 adb install -r .\app\build\outputs\apk\debug\app-debug.apk
-```
-
-앱에 포함된 테스트 레이아웃과 로고로 출력:
-
-```powershell
-adb shell am startservice `
-  -n ks.cloud.printer/.PrinterService `
-  -a ks.cloud.printer.action.PRINT_TICKET `
-  --es title "대기번호" `
-  --es number "14" `
-  --es waiting_count "13" `
-  --ez use_test_logo true `
-  --ez use_test_layout true
 ```
 
 로그 확인:
@@ -278,8 +280,8 @@ adb logcat -s KS_PRINTER_SERVICE KS_PRINTER
 
 ## 운영 시 주의사항
 
-- USB 권한이 없으면 서비스 출력이 실패합니다. 최초 권한 승인은 앱 화면에서
-  처리해야 합니다.
+- USB 권한이 없으면 서비스 출력이 실패합니다. 최초 권한 승인은 `Run main` 실행 시
+  표시되는 Android 시스템 USB 권한 팝업에서 처리합니다.
 - 현재 서비스는 외부 앱 호출을 위해 공개되어 있습니다. 배포 환경에서는 임의 앱의
   호출을 막기 위해 signature 권한을 추가하는 것이 안전합니다.
 - `layout_json`이 없으면 신규 디자인이 아닌 레거시 티켓으로 출력됩니다.

@@ -278,6 +278,39 @@ adb install -r .\app\build\outputs\apk\debug\app-debug.apk
 adb logcat -s KS_PRINTER_SERVICE KS_PRINTER
 ```
 
+## 테스트 UI
+
+현장 테스트용 Windows PowerShell UI를 제공합니다.
+
+```powershell
+.\test-print.ps1
+```
+
+또는 직접 실행:
+
+```powershell
+powershell.exe -ExecutionPolicy Bypass -File .\tools\printer-test-ui.ps1
+```
+
+기능:
+
+- `adb devices -l` 결과를 읽어 ADB 기기를 선택
+- 드롭다운에는 device id와 model만 표시
+- 기기별 앱 설치 여부 로그 표시 및 설치된 기기 자동 선택
+- APK 빌드
+- 선택한 기기에 APK 설치
+- USB 권한 확인 화면 실행
+- 제목, 번호, 대기인수 값을 넣어 테스트 출력 요청
+
+테스트 출력은 앱에 포함된 `assets/ticket_layout.json`과 `assets/logo.bmp`를
+사용합니다. 실제 KS Client 연동에서는 `layout_json`과 `image_bytes`를 Intent로
+전달하는 구조를 사용합니다.
+
+Android의 백그라운드 서비스 실행 제한을 피하기 위해 테스트 UI는
+`PrinterService`를 직접 `startservice`로 호출하지 않습니다. `MainActivity`를 잠깐
+실행한 뒤 앱 내부에서 권한 확인과 테스트 출력을 진행합니다. 테스트 UI 또는
+Activity 코드가 바뀐 뒤에는 `APK 빌드`와 `APK 설치`를 다시 실행해야 합니다.
+
 ## 운영 시 주의사항
 
 - USB 권한이 없으면 서비스 출력이 실패합니다. 최초 권한 승인은 `Run main` 실행 시
